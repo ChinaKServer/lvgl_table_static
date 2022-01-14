@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_table.c
  *
  */
@@ -312,14 +312,14 @@ void lv_table_set_col_cnt(lv_obj_t* obj, uint16_t col_cnt)
     }
 
     char** new_cell_data = lv_mem_alloc(table->row_cnt * table->col_cnt * sizeof(char*));
-    char** new_static_data = lv_mem_alloc(table->row_cnt * table->col_cnt * sizeof(char*));
     LV_ASSERT_MALLOC(new_cell_data);
-    LV_ASSERT_MALLOC(new_static_data);
     if (new_cell_data == NULL) return;
-    if (new_static_data == NULL) return;
     uint32_t new_cell_cnt = table->col_cnt * table->row_cnt;
     lv_memset_00(new_cell_data, new_cell_cnt * sizeof(table->cell_data[0]));
 #if LV_TABLE_USE_STATICTEXT == 1
+    char** new_static_data = lv_mem_alloc(table->row_cnt * table->col_cnt * sizeof(char*));
+    if (new_static_data == NULL) return;
+    LV_ASSERT_MALLOC(new_static_data);
     lv_memset_00(new_static_data, new_cell_cnt * sizeof(table->static_text[0]));
 #endif
 
@@ -813,11 +813,11 @@ static void draw_main(lv_event_t* e)
                     lv_txt_get_size(&txt_size, table->static_text[cell], label_dsc_def.font, label_dsc_act.letter_space, label_dsc_act.line_space, lv_area_get_width(&txt_area), txt_flags);
 
                 } else {
-#else
-                if (1) {
 #endif
                     lv_txt_get_size(&txt_size, table->cell_data[cell] + 1, label_dsc_def.font, label_dsc_act.letter_space, label_dsc_act.line_space, lv_area_get_width(&txt_area), txt_flags);
+#if LV_TABLE_USE_STATICTEXT == 1
                 }
+#endif
 
                 /*Align the content to the middle if not cropped*/
                 if (!crop) {
@@ -833,11 +833,11 @@ static void draw_main(lv_event_t* e)
                     if (table->static_text[cell] != NULL) {
                         lv_draw_label(&txt_area, &label_mask, &label_dsc_act, table->static_text[cell], NULL);
                     } else {
-#else
-                    if (1) {
 #endif
                         lv_draw_label(&txt_area, &label_mask, &label_dsc_act, table->cell_data[cell] + 1, NULL);
+#if LV_TABLE_USE_STATICTEXT == 1
                     }
+#endif
                 }
             }
 
@@ -849,7 +849,7 @@ static void draw_main(lv_event_t* e)
     }
 }
 
-static void refr_size(lv_obj_t * obj, uint32_t strat_row)
+static void refr_size(lv_obj_t* obj, uint32_t strat_row)
 {
     lv_table_t* table = (lv_table_t*)obj;
 
@@ -876,7 +876,7 @@ static void refr_size(lv_obj_t * obj, uint32_t strat_row)
     lv_obj_refresh_self_size(obj);
 }
 
-static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_t * font,
+static lv_coord_t get_row_height(lv_obj_t* obj, uint16_t row_id, const lv_font_t* font,
     lv_coord_t letter_space, lv_coord_t line_space,
     lv_coord_t cell_left, lv_coord_t cell_right, lv_coord_t cell_top, lv_coord_t cell_bottom)
 {
@@ -933,7 +933,7 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
     return h_max;
 }
 
-static lv_res_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
+static lv_res_t get_pressed_cell(lv_obj_t* obj, uint16_t* row, uint16_t* col)
 {
     lv_table_t* table = (lv_table_t*)obj;
 
